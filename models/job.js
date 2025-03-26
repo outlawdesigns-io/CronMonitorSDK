@@ -8,7 +8,7 @@ const Execution = require('./execution');
 class Job extends Record{
 
   constructor(id){
-    const database = process.env.MYSQL_DB || 'cron';
+    const database = process.env.MYSQL_CRON_DB || 'cron';
     const table = 'job';
     const primaryKey = 'id';
     super(database,table,primaryKey,id);

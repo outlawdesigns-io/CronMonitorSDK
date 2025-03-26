@@ -5,7 +5,7 @@ const Record = require('outlawdesigns.io.noderecord');
 class Execution extends Record{
 
   constructor(id){
-    const database = process.env.MYSQL_DB || 'cron';
+    const database = process.env.MYSQL_CRON_DB || 'cron';
     const table = 'execution';
     const primaryKey = 'id';
     super(database,table,primaryKey,id);
