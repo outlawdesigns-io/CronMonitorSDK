@@ -1,6 +1,6 @@
 "use strict";
 
-const parser = require('cron-parser');
+const { CronExpressionParser } = require('cron-parser');
 const Record = require('outlawdesigns.io.noderecord');
 const CronTemplate = require('../cronTemplate');
 const Execution = require('./execution');
@@ -33,7 +33,7 @@ class Job extends Record{
   }
   getExecutionInterval(){
     try{
-      let interval = parser.parseExpression(this.cronTime);
+      let interval = CronExpressionParser.parse(this.cronTime);
       return interval;
     }catch(err){
       throw err;
@@ -70,7 +70,7 @@ class Job extends Record{
   }
   static getPatternInterval(patternStr){
     try{
-      let interval = parser.parseExpression(patternStr);
+      let interval = CronExpressionParser.parse(patternStr);
       return interval;
     }catch(err){
       throw err;
