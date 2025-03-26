@@ -1,6 +1,6 @@
 {
   "name": "outlawdesigns.io.cronmonitorsdk",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "SDK for Cron Monitor Service",
   "main": "index.js",
   "scripts": {
@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cron-parser": "^5.0.6",
     "outlawdesigns.io.noderecord": "^2.0.1"
   }
 }
