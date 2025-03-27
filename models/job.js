@@ -28,7 +28,8 @@ class Job extends Record{
       'pathVariable',
       'tz_code',
       'cronWrapperPath',
-      'created_date'
+      'created_date',
+      'disabled'
     ];
   }
   getExecutionInterval(){
