@@ -1,7 +1,7 @@
 "use strict";
 
 const { CronExpressionParser } = require('cron-parser');
-const Record = require('outlawdesigns.io.noderecord');
+const Record = require('@outlawdesigns/db-record');
 const CronTemplate = require('../cronTemplate');
 const Execution = require('./execution');
 

@@ -1,6 +1,6 @@
 "use strict";
 
-const Record = require('outlawdesigns.io.noderecord');
+const Record = require('@outlawdesigns/db-record');
 
 class Subscription extends Record{
 
