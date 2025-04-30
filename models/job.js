@@ -7,11 +7,14 @@ const Execution = require('./execution');
 
 class Job extends Record{
 
+  static table = 'job';
+  static primaryKey = 'id';
+  static get database(){
+    return process.env.MYSQL_CRON_DB || 'cron';
+  }
+
   constructor(id){
-    const database = process.env.MYSQL_CRON_DB || 'cron';
-    const table = 'job';
-    const primaryKey = 'id';
-    super(database,table,primaryKey,id);
+    super(Job.database,Job.table,Job.primaryKey,id);
     this.publicKeys = [
       'id',
       'title',
@@ -42,16 +45,15 @@ class Job extends Record{
   }
   static async getByHost(hostname, isImg = false){
     return new Promise((resolve,reject)=>{
-      let obj = new Job();
       let colName = isImg ? "imgName":"hostname";
-      obj.db.table(obj.table).select(obj.primaryKey).where(`${colName} = '${hostname}'`);
+      let db = this.getDb().table(this.table).select(this.primaryKey).where(`${colName} = ?`,[hostname]);
       if(!isImg){
-        obj.db.andWhere("!container");
+        db.andWhere("!container");
       }
-      obj.db.execute().then( async (data)=>{
+      db.execute().then( async (data)=>{
         let ret = [];
         for(let i = 0; i < data.length; i++){
-          let job = await new Job(data[i][obj.primaryKey]).init();
+          let job = await new this(data[i][this.primaryKey]).init();
           ret.push(job.getPublicProperties());
         }
         resolve(ret);
@@ -60,8 +62,7 @@ class Job extends Record{
   }
   static recordExists(targetId){
     return new Promise((resolve,reject)=>{
-      let obj = new Job();
-      obj.db.table(obj.table).select(obj.primaryKey).where(obj.primaryKey + ' = ' + targetId).execute().then((data)=>{
+      this.getDb().table(this.table).select(this.primaryKey).where(`${this.primaryKey} = ?`,[targetId]).execute().then((data)=>{
         if(!data.length){
           resolve(false);
         }

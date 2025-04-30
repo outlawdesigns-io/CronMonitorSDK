@@ -4,11 +4,14 @@ const Record = require('@outlawdesigns/db-record');
 
 class Subscription extends Record{
 
+  static table = 'event_subscription';
+  static primaryKey = 'id';
+  static get database(){
+    return process.env.MYSQL_CRON_DB || 'cron';
+  }
+
   constructor(id){
-    const database = process.env.MYSQL_CRON_DB || 'cron';
-    const table = 'event_subscription';
-    const primaryKey = 'id';
-    super(database,table,primaryKey,id);
+    super(Subscription.database,Subscription.table,Subscription.primaryKey,id);
     this.publicKeys = [
       'id',
       'eventId',

@@ -3,12 +3,14 @@
 const Record = require('@outlawdesigns/db-record');
 
 class Event extends Record{
+  static table = 'event';
+  static primaryKey = 'id';
+  static get database(){
+    return process.env.MYSQL_CRON_DB || 'cron';
+  }
 
   constructor(id){
-    const database = process.env.MYSQL_CRON_DB || 'cron';
-    const table = 'event';
-    const primaryKey = 'id';
-    super(database,table,primaryKey,id);
+    super(Event.database,Event.table,Event.primaryKey,id);
     this.publicKeys = [
       'id',
       'name'

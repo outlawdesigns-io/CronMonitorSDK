@@ -4,11 +4,14 @@ const Record = require('@outlawdesigns/db-record');
 
 class Execution extends Record{
 
+  static table = 'execution';
+  static primaryKey = 'id';
+  static get database(){
+    return process.env.MYSQL_CRON_DB || 'cron';
+  }
+
   constructor(id){
-    const database = process.env.MYSQL_CRON_DB || 'cron';
-    const table = 'execution';
-    const primaryKey = 'id';
-    super(database,table,primaryKey,id);
+    super(Execution.database,Execution.table,Execution.primaryKey,id);
     this.publicKeys = [
       'id',
       'jobId',
@@ -19,8 +22,7 @@ class Execution extends Record{
   }
   static recordExists(targetId){
     return new Promise((resolve,reject)=>{
-      let obj = new Execution();
-      obj.db.table(obj.table).select(obj.primaryKey).where(obj.primaryKey + ' = ' + targetId).execute().then((data)=>{
+      this.getDb().table(this.table).select(this.primaryKey).where(`${this.primaryKey} = ?`,[targetId]).execute().then((data)=>{
         if(!data.length){
           resolve(false);
         }
@@ -34,10 +36,9 @@ class Execution extends Record{
   }
   static async getLast(jobId){
     return new Promise((resolve,reject)=>{
-      let obj = new Execution();
-      obj.db.table(obj.table).select(obj.primaryKey).where("jobId = " + jobId).orderBy("endTime desc limit 1").execute().then(async (data)=>{
+      this.getDb().table(this.table).select(this.primaryKey).where("jobId = ?",[jobId]).orderBy("endTime desc limit 1").execute().then(async (data)=>{
         if(data.length){
-          let exec = await new Execution(data[0][obj.primaryKey]).init();
+          let exec = await new this(data[0][this.primaryKey]).init();
           resolve(exec.getPublicProperties());
         }
         reject({error:"No Execution History"})
@@ -46,8 +47,7 @@ class Execution extends Record{
   }
   static async getAverageExecutionTime(jobId){
     try{
-      let obj  = new Execution();
-      let data = await obj.db.table(obj.table).select('avg(TIME_TO_SEC(TIMEDIFF(endTime,startTime))) as avg_execution_seconds').where('jobId = ' + jobId).execute();
+      let data = await this.getDb().table(this.table).select('avg(TIME_TO_SEC(TIMEDIFF(endTime,startTime))) as avg_execution_seconds').where('jobId = ?', [jobId]).execute();
       return data[0]['avg_execution_seconds'];
     }catch(err){
       // console.log(err);
@@ -56,8 +56,7 @@ class Execution extends Record{
   }
   static async deleteJobHistory(jobId){
     try{
-      let obj = new Execution();
-      return obj.db.table(obj.table).delete().where('jobId = ' + jobId).execute();
+      return this.getDb().table(this.table).delete().where('jobId = ?',[jobId]).execute();
     }catch(err){
       throw err;
     }
